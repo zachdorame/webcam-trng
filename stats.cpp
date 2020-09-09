@@ -1,10 +1,9 @@
 #include "stats.h"
 #include "rand.h"
-float chiSquare(int* freqs, int frames) { //NOTE: freqs is of known size 100, since k = 100
+float chiSquare(int* freqs, float frames) { 
 	float chiSq = 0;
 	int i = 0;
 	float expectVal = frames/100; //This function will only be used to test hash-values from 0-99
-	//std::cout << expectVal << " ";
 	while(i != 100) {
 		//std::cout << i << " : " << *freqs << " " << std::endl;
 		chiSq += ((double)((*freqs - expectVal) * (*freqs++ - expectVal))) / expectVal;
@@ -14,8 +13,7 @@ float chiSquare(int* freqs, int frames) { //NOTE: freqs is of known size 100, si
 	return chiSq;
 }
 
-//this function is meant to be exited by user, but we'll just run it a hundred times.... TODO!!!
-//TODO: display video live
+
 std::vector<float> deltaRand(cv::VideoCapture cam, int frames) {
 	//k = 100
 	float ALPHA = 123.225;
@@ -90,18 +88,27 @@ void cvSwap(cv::Mat& src, int x1, int y1, int x2, int y2) {
 //	src.at<uchar>(x2, y2) = temp;
 }
 
-void imgScramble(const cv::Mat& src, cv::VideoCapture& cam) { //o(n/2) to scramble whole image?
+void imgScramble(const cv::Mat& src, cv::VideoCapture& cam) { 
 	cv::Mat dest = src; //copy src to dest
 	cv::namedWindow("Scramble", cv::WINDOW_AUTOSIZE);
 	int max = (src.cols * src.rows);
-	int half_max = max / 2;
+
+	random ranum(cam);
 
 	cv::imshow("Scramble", dest);
 	cv::waitKey(1);
-	for (int i = 0; i < half_max; ++i) {
-		//std::cout << i << std::endl;
+
+	int rand_num;
+	for (int i = 0; i < src.rows; ++i) {
+		for (int j = 0; j < src.cols; ++j) {
 			cv::imshow("Scramble", dest);
 			cv::waitKey(1);
-		cvSwap(dest, rand(src.rows, cam), rand(src.cols, cam), rand(src.rows, cam), rand(src.cols, cam));
+			//rand_num = rand(RAND_MAX, cam);
+			rand_num = ranum.getRand();
+			//cvSwap(dest, i, j, rand_num%src.rows, rand_num%src.cols);
+			cvSwap(dest, i, j, ranum.getRand()%src.rows, ranum.getRand() % src.cols); //CURRENTLY WORKS BEST
+			//cvSwap(dest, ranum.getRand() % src.rows, ranum.getRand() % src.cols, ranum.getRand() % src.rows, ranum.getRand() % src.cols);
+			//cvSwap(dest, i, j, rand()%src.rows, rand()%src.cols); //<-- compete with this
+		}
 	}
 }

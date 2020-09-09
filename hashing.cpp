@@ -2,7 +2,7 @@
 #include <iostream>
 
 
-//this is extremely slow :(
+//this is extremely slow, we don't use this
 int hashMat(const cv::Mat& src, int limit) {
 	std::string hashString;
 
@@ -34,9 +34,7 @@ double quickHash(cv::Mat& src, int limit) {
 		for (int row = 0; row < src.rows; ++row) {
 			const int* ptr = src.ptr<int>(row);
 			for (int col = 0; col < src.cols; ++col) {
-				//std::cout << *ptr << " "; // dump
-				//hash = (hash + (*ptr++)) & limit;
-				hash = abs(fmod(((*ptr++) + hash), limit)); //this seems to work as intended
+				hash = abs(fmod(((*ptr++) + hash), limit)); 
 			}
 		}
 
